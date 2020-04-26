@@ -76,7 +76,7 @@ public class Vitrus_Genenator_2 : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         textureWidth = matrixSize * cellSize;
         textureHeight = matrixSize * cellSize;
-        texture = new Texture2D(textureWidth, textureHeight);
+        texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
         Rect myRect = new Rect(0, 0, textureWidth, textureHeight);
         mySprite = Sprite.Create(texture, myRect, new Vector2(.5f, .5f));
         spriteRenderer.sprite = mySprite;
@@ -120,57 +120,29 @@ public class Vitrus_Genenator_2 : MonoBehaviour
 
     }
 
-    private void ColorCell(int ox, int oy, Color color)
-    {
-        for (int x = ox * cellSize; x < ox * cellSize + cellSize; x++)
-        {
-            for (int y = oy * cellSize; y < oy * cellSize + cellSize; y++)
-            {
-                texture.SetPixel(x, y, color);
-            }
-        }
-    }
-
     private void SetRenderOutput()
     {
-        // cell Size e toRender
+        Color[] cols = texture.GetPixels();
 
-        for(int x = 0; x < matrixSize; x++)
+        for (int x = 0; x < matrixSize; x++)
         {
             for (int y = 0; y < matrixSize; y++)
             {
 
-                if (toRender[x, y] == 1)
-                {
-                    ColorCell(x, y, colors[1]);
-                }
-                else
-                {
-                    ColorCell(x, y, colors[0]);
-                }
+                    for (int xa = x * cellSize; xa < x * cellSize + cellSize; xa++)
+                    {
+                        for (int ya = y * cellSize; ya < y * cellSize + cellSize; ya++)
+                        {
+                            cols[(xa * (matrixSize*cellSize)) + ya] = colors[toRender[x, y]];
+                        }
+                    }
+               
             }
 
         }
 
-
-        //for (int y = 1; y < texture.height; y = y + 2)
-        //{
-        //    for (int x = 1; x < texture.width; x = x + 2)
-        //    {
-        //        Color color = colors[actualColor];
-        //        texture.SetPixel(x, y, color);
-        //    }
-        //}
-
-        //for (int y = 0; y < texture.height; y = y + 2)
-        //{
-        //    for (int x = 0; x < texture.width; x = x + 2)
-        //    {
-        //        Color color = colors2[actualColor];
-        //        texture.SetPixel(x, y, color);
-        //    }
-        //}
-
+        //Debug.Log("mips: " + texture.mipmapCount);
+        texture.SetPixels(cols);
         texture.Apply();
     }
 }
