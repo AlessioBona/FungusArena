@@ -6,17 +6,11 @@ using System;
 public class GameOfLife
 {
     
-        //int[,] statusArray = new int[5, 5] { { 1,0,1,0,0}, { 1, 0, 1, 0, 0 } , { 1, 0, 1, 0, 0 } , { 1, 0, 1, 0, 0 } , { 1, 0, 1, 0, 0 } };
-        //int[,] toRenderArray = new int[5, 5] { { 1, 0, 1, 0, 0 }, { 1, 0, 1, 0, 0 }, { 1, 0, 1, 0, 0 }, { 1, 0, 1, 0, 0 }, { 1, 0, 1, 0, 0 } };
-        
-    
-         
     public static void UpdateCellStatus(int[,] status, int[,] toRender)
     {
         int arraySizeX = status.GetLength(0);
         int arraySizeY = status.GetLength(1);
-        //Debug.Log(arraySizeX);
-        //Debug.Log(arraySizeY);
+      
         //loop through status array and check neighbors of each cell
         for (int j = 0; j < arraySizeX; j++) //columns
         {

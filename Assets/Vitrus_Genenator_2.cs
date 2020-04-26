@@ -2,27 +2,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Vitrus_Genenator_2 : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
+    public Image myImage;
     Texture2D texture;
     Sprite mySprite;
     int textureWidth = 256;
     int textureHeight = 256;
 
     public Color[] colors;
-    //public Color[] colors2;
-    //int actualColor = 0;
 
     [Header("Game of Live vars")]
     public int matrixSize = 32;
     public int cellSize = 4;
     public int radius = 20;
 
+    [Header("Loop variables")]
+    public bool paused = false;
+
     int[,] matrix_1;
     int[,] matrix_2;
     int[,] toRender;
+
+    public float refreshTime = 1f;
+    float timer;
 
     // definiert welche matrix zur Updatefunktion als Referenz und welche als Output weitergegeben wird
     bool actualMatrix = true;
@@ -30,34 +36,35 @@ public class Vitrus_Genenator_2 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PrepareRenderer();
-        Restart();
-        //matrix_1 = new int[,] { {1 , 0 }, {0 , 1 } };
-        //matrix_2 = matrix_1;
-        //ChangeArray(matrix_2);
-        //Debug.Log(matrix_1[0, 0]);
-
-
+        paused = true;
     }
 
-    public void Restart()
+    // Update is called once per frame
+    void Update()
     {
-        PrepareMatrixes();
-        timer = refreshTime;
-        actualMatrix = true;
+        if (!paused)
+        {
+            timer -= Time.deltaTime;
+            if (timer < 0)
+            {
+                PlayRound();
+                SetRenderOutput();
+                timer = refreshTime;
+            }
+        }
     }
 
-    //private void ChangeArray(int[,] toChange)
-    //{
-    //    toChange[0, 0] = 0;
-    //}
-
-    private void PrepareMatrixes()
+    public void StandardStartOfGOL()
     {
-        // prepare matrix_1
-        matrix_1 = MakePetriDishFromMatrix(matrixSize, radius);
-        matrix_2 = MakePetriDishFromMatrix(matrixSize, radius);
+        SetUpRandomGameOfLife();
+        StartSimulation();
+    }
 
+    #region public functions
+
+
+    public void SetUpRandomGameOfLife()
+    {
         for (int x = 0; x < matrixSize; x++)
         {
             for (int y = 0; y < matrixSize; y++)
@@ -69,9 +76,47 @@ public class Vitrus_Genenator_2 : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void PrepareEmptyDish()
+    {
+        timer = refreshTime;
+        actualMatrix = true;
+        PrepareRenderer();
+        PrepareMatrixes();
+    }
+
+    public void StartSimulation()
+    {
+        SetRenderOutput();
+        paused = false;
+    }
+
+    public void PauseSimulation()
+    {
+        paused = true;
+    }
+
+    public void UnpauseSimulation()
+    {
+        paused = false;
+    }
+
+    public void SwitchPauseSimulation()
+    {
+        paused = !paused;
+    }
+
+    #endregion
+
+    private void PrepareMatrixes()
+    {
+        // prepare matrix_1
+        matrix_1 = MakePetriDishFromMatrix(matrixSize, radius);
+        matrix_2 = MakePetriDishFromMatrix(matrixSize, radius);
 
         toRender = matrix_1;
-        SetRenderOutput();
+        
     }
 
     private int[,] MakePetriDishFromMatrix(int size, int radius)
@@ -107,33 +152,25 @@ public class Vitrus_Genenator_2 : MonoBehaviour
     }
 
 
-
+    /// <summary>
+    /// creates the Texture2D and assign it to the SpriteRenderer
+    /// </summary>
     private void PrepareRenderer()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        myImage = GetComponent<Image>();
         textureWidth = matrixSize * cellSize;
         textureHeight = matrixSize * cellSize;
         texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
         Rect myRect = new Rect(0, 0, textureWidth, textureHeight);
         mySprite = Sprite.Create(texture, myRect, new Vector2(.5f, .5f));
-        spriteRenderer.sprite = mySprite;
+        //spriteRenderer.sprite = mySprite;
+        myImage.sprite = mySprite;
     }
 
-    public float refreshTime = 1f;
-    float timer;
+    
 
-    // Update is called once per frame
-    void Update()
-    {
-        // mit timer
-        timer -= Time.deltaTime;
-        if (timer < 0)
-        {
-            SetRenderOutput();
-            PlayRound();
-            timer = refreshTime;
-        }
-    }
+
 
     private void PlayRound()
     {
@@ -152,10 +189,6 @@ public class Vitrus_Genenator_2 : MonoBehaviour
         actualMatrix = !actualMatrix;
     }
 
-    private void FakeGame(int[,] intro, int[,] outro)
-    {
-
-    }
 
     private void SetRenderOutput()
     {
@@ -178,7 +211,6 @@ public class Vitrus_Genenator_2 : MonoBehaviour
 
         }
 
-        //Debug.Log("mips: " + texture.mipmapCount);
         texture.SetPixels(cols);
         texture.Apply();
     }
