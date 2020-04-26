@@ -18,6 +18,7 @@ public class Vitrus_Genenator_2 : MonoBehaviour
     [Header("Game of Live vars")]
     public int matrixSize = 32;
     public int cellSize = 4;
+    public int radius = 20;
 
     int[,] matrix_1;
     int[,] matrix_2;
@@ -54,19 +55,55 @@ public class Vitrus_Genenator_2 : MonoBehaviour
     private void PrepareMatrixes()
     {
         // prepare matrix_1
-        matrix_1 = new int[matrixSize, matrixSize];
-        matrix_2 = new int[matrixSize, matrixSize];
+        matrix_1 = MakePetriDishFromMatrix(matrixSize, radius);
+        matrix_2 = MakePetriDishFromMatrix(matrixSize, radius);
 
         for (int x = 0; x < matrixSize; x++)
         {
             for (int y = 0; y < matrixSize; y++)
             {
-                matrix_1[x, y] = UnityEngine.Random.Range(0, 2);
+                // if the cell is not outside the petridish make it alive or dead
+                if (matrix_1[x, y] != 2)
+                {
+                    matrix_1[x, y] = UnityEngine.Random.Range(0, 2);
+                }
             }
         }
 
         toRender = matrix_1;
         SetRenderOutput();
+    }
+
+    private int[,] MakePetriDishFromMatrix(int size, int radius)
+    {
+        int[,] matrix = new int[size, size];
+        // initialize matrix with 2 (status for the petridish)
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                matrix[i, j] = 2;
+            }
+        }
+
+        // make the matrixes a petriDish
+        int center = (int)size / 2;
+        // make sure that the radius is not larger than it can be
+        //if (center - radius < 0) radius = center;
+        for (int x = center - radius; x <= center; x++)
+        {
+            for (int y = center - radius; y <= center; y++)
+            {
+                if ((x - center) * (x - center) + (y - center) * (y - center) < radius * radius)
+                {
+                    matrix[x, y] = 0;
+                    matrix[x, center - y + center - 1] = 0;
+                    matrix[center - x + center - 1, y] = 0;
+                    matrix[center - (x - center) -1 , center - (y - center) - 1] = 0;
+                }
+            }
+        }
+        return matrix;
     }
 
 
@@ -132,8 +169,8 @@ public class Vitrus_Genenator_2 : MonoBehaviour
                     for (int xa = x * cellSize; xa < x * cellSize + cellSize; xa++)
                     {
                         for (int ya = y * cellSize; ya < y * cellSize + cellSize; ya++)
-                        {
-                            cols[(xa * (matrixSize*cellSize)) + ya] = colors[toRender[x, y]];
+                        {   
+                        cols[(xa * (matrixSize*cellSize)) + ya] = colors[toRender[x, y]];
                         }
                     }
                
