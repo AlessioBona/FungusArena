@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class VitrusClicker : MonoBehaviour, IPointerDownHandler
 {
-    Vitrus_Genenator_2 vitrGen;
+    BattleManager battleManager;
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -17,16 +17,16 @@ public class VitrusClicker : MonoBehaviour, IPointerDownHandler
         Debug.Log("LocalCursor:" + localCursor);
 
         // if pivot 0.0
-        vitrGen.SetAPointInMatrix(
-            (int)(localCursor.y / (GetComponent<RectTransform>().rect.height / vitrGen.matrixSize)),
-            (int)(localCursor.x / (GetComponent<RectTransform>().rect.width / vitrGen.matrixSize))
+        battleManager.SetAPointInMatrix(
+            (int)(localCursor.y / (GetComponent<RectTransform>().rect.height / battleManager.matrixSize)),
+            (int)(localCursor.x / (GetComponent<RectTransform>().rect.width / battleManager.matrixSize))
             );
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        vitrGen = GetComponent<Vitrus_Genenator_2>();
+        battleManager = FindObjectOfType<BattleManager>();
     }
 
     // Update is called once per frame
