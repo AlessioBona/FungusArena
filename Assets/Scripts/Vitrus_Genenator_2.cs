@@ -109,6 +109,13 @@ public class Vitrus_Genenator_2 : MonoBehaviour
 
     #endregion
 
+    public void SetAPointInMatrix(int x, int y)
+    {
+        matrix_1[x, y] = 1;
+        matrix_2[x, y] = 1;
+        SetRenderOutput();
+    }
+
     private void PrepareMatrixes()
     {
         // prepare matrix_1
